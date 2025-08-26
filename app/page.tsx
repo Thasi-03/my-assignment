@@ -1,103 +1,150 @@
-import Image from "next/image";
+"use client";
+import { useMemo, useState } from "react";
 
-export default function Home() {
+type Tab = { title: string; content: string };
+const esc = (s:string) => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]!));
+
+export default function HomePage() {
+  const [label, setLabel] = useState("Sample tabs");
+  const [tabs, setTabs] = useState<Tab[]>([
+    { title: "Tab 1", content: "Hello from Tab 1" },
+    { title: "Tab 2", content: "Hello from Tab 2" },
+  ]);
+  const [out, setOut] = useState("");
+
+  const move = (i:number, dir:-1|1) => {
+    setTabs(prev => {
+      const a=[...prev]; const j=i+dir;
+      if (j<0 || j>=a.length) return a;
+      [a[i], a[j]] = [a[j], a[i]];
+      return a;
+    });
+  };
+
+  const generated = useMemo(() => {
+    const html = `
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabs</title>
+
+<!-- Student: 21969946 -->
+<div id="app" style="font-family:system-ui,Arial,sans-serif;max-width:960px;margin:1rem auto;">
+  <h1 style="font-size:1.25rem;margin:0 0 .75rem;">Tabs Demo</h1>
+
+  <div role="tablist" aria-label="${esc(label)}" style="display:flex;gap:.25rem;flex-wrap:wrap;">
+    ${tabs.map((t,i)=>`
+      <button role="tab" id="tab-${i}" aria-controls="panel-${i}" aria-selected="${i===0}" tabindex="${i===0?0:-1}"
+        style="border:1px solid #888;padding:.5rem .75rem;border-radius:.5rem;background:${i===0?"#eee":"#fff"};cursor:pointer;">
+        ${esc(t.title)}
+      </button>`).join("")}
+  </div>
+
+  ${tabs.map((t,i)=>`
+  <div role="tabpanel" id="panel-${i}" aria-labelledby="tab-${i}" ${i===0?"":"hidden"}
+    style="border:1px solid #888;border-radius:.5rem;padding:1rem;margin-top:.5rem;">
+    ${esc(t.content)}
+  </div>`).join("")}
+</div>
+
+<script>
+(function(){
+  function setCookie(name,value,days){var d=new Date();d.setTime(d.getTime()+days*864e5);document.cookie=name+"="+encodeURIComponent(value)+";expires="+d.toUTCString()+";path=/";}
+  function getCookie(name){var m=document.cookie.match(new RegExp('(?:^|; )'+name+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
+  var n=${tabs.length}, idx=[${tabs.map((_,i)=>i).join(",")}];
+  var selected=parseInt(getCookie("selected_tab")||"0",10);
+
+  function select(i){
+    idx.forEach(function(j){
+      var tab=document.getElementById("tab-"+j);
+      var panel=document.getElementById("panel-"+j);
+      var active=j===i;
+      tab.setAttribute("aria-selected", active);
+      tab.tabIndex = active?0:-1;
+      tab.style.background = active?"#eee":"#fff";
+      if(active){ panel.removeAttribute("hidden"); tab.focus(); }
+      else { panel.setAttribute("hidden",""); }
+    });
+    setCookie("selected_tab", i, 30);
+  }
+  idx.forEach(function(i){
+    var el=document.getElementById("tab-"+i);
+    el.addEventListener("click", function(){ select(i); });
+    el.addEventListener("keydown", function(e){
+      if(e.key==="ArrowRight"){ select((i+1)%n); }
+      if(e.key==="ArrowLeft"){ select((i-1+n)%n); }
+    });
+  });
+  if(!isNaN(selected) && selected>=0 && selected<n){ select(selected); }
+})();
+</script>
+</html>`.trim();
+    return html;
+  }, [tabs, label]);
+
+  const generate = () => setOut(generated);
+
+  const download = () => {
+    const blob = new Blob([out || generated], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "Hello.html";
+    document.body.appendChild(a); a.click();
+    a.remove(); URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <section className="space-y-4">
+      <h1 className="text-2xl font-semibold">HTML Tabs Generator</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <label className="block">ARIA label for tablist
+        <input className="border rounded p-2 w-full"
+               value={label} onChange={e=>setLabel(e.target.value)} />
+      </label>
+
+      <div className="space-y-2" aria-label="Configure tabs">
+        {tabs.map((t,i)=>(
+          <fieldset key={i} className="border rounded p-3">
+            <legend className="px-1">Tab {i+1}</legend>
+            <div className="flex gap-2 mb-2">
+              <button type="button" className="px-2 py-1 border rounded" onClick={()=>move(i,-1)}>↑</button>
+              <button type="button" className="px-2 py-1 border rounded" onClick={()=>move(i, 1)}>↓</button>
+              <button type="button" className="px-2 py-1 border rounded ml-auto"
+                      onClick={()=>setTabs(p=>p.filter((_,j)=>j!==i))}>Remove</button>
+            </div>
+            <label className="block mb-1">Title
+              <input className="border rounded p-2 w-full" value={t.title}
+                onChange={e=>setTabs(p=>p.map((x,j)=>j===i?{...x,title:e.target.value}:x))}/>
+            </label>
+            <label className="block">Content
+              <textarea className="border rounded p-2 w-full min-h-24" value={t.content}
+                onChange={e=>setTabs(p=>p.map((x,j)=>j===i?{...x,content:e.target.value}:x))}/>
+            </label>
+          </fieldset>
+        ))}
+        <button className="px-3 py-2 border rounded" type="button"
+          onClick={()=>setTabs(p=>[...p,{title:`Tab ${p.length+1}`,content:"..."}])}>
+          + Add Tab
+        </button>
+      </div>
+
+      <div className="flex gap-2">
+        <button className="px-3 py-2 border rounded" type="button" onClick={generate}>Generate</button>
+        <button className="px-3 py-2 border rounded" type="button"
+                onClick={()=>navigator.clipboard.writeText(out || generated)}>Copy</button>
+        <button className="px-3 py-2 border rounded" type="button" onClick={download}>Download</button>
+      </div>
+
+      {/* Live preview */}
+      <div className="border rounded">
+        <iframe title="Preview" className="w-full" style={{height: 360}}
+                srcDoc={out || generated} />
+      </div>
+
+      <label className="block">Output HTML:
+        <textarea className="border rounded p-2 w-full min-h-64" value={out || generated} readOnly />
+      </label>
+    </section>
   );
 }
