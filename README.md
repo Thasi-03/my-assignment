@@ -1,6 +1,7 @@
 Assignment 1 — Accessible Tabs Generator (Next.js)
 
 Name: Thasigaran Sagadevan
+
 Student No: 21969946
 
 A small Next.js app that generates a single-file HTML tabs component with inline CSS/JS only (no classes).
