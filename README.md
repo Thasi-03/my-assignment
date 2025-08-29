@@ -1,10 +1,10 @@
-Assignment 1 — Accessible Tabs Generator (Next.js)
+Assignment 1 CSE3CWA
 
 Name: Thasigaran Sagadevan
 Student No: 21969946
 
-A small Next.js app that generates a single-file HTML tabs component with inline CSS/JS only (no classes).
-Includes: Header (student no., nav, hamburger + transform, theme toggle), Breadcrumbs, Footer, and a minimal About page (name, student no., how-to video).
+A Next.js app that generates a single-file HTML tabs component with inline CSS/JS only (no classes).
+Includes: Header (student no., nav, hamburger + transform, theme toggle), Breadcrumbs, Footer; a About page (name, student no., how-to video), and coding-races, court room, escape room pages which can be modified later.
 
 Requirements
 
