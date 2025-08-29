@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Assignment 1 CSE3CWA
 
-## Getting Started
+Name: Thasigaran Sagadevan
+Student No: 21969946
 
-First, run the development server:
+A Next.js app that generates a single-file HTML tabs component with inline CSS/JS only (no classes).
+Includes: Header (student no., nav, hamburger + transform, theme toggle), Breadcrumbs, Footer; a About page (name, student no., how-to video), and coding-races, court room, escape room pages which can be modified later.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Requirements
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Node.js 18+ (recommended: 20)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+npm
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Install & Run (local)
+# clone
+git clone https://github.com/Thasi-03/my-assignment.git
+cd my-assignment
 
-## Learn More
+# install
+npm ci   # or: npm install
 
-To learn more about Next.js, take a look at the following resources:
+# dev
+npm run dev           # http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# production (local)
+npm run build
+npm run start         # http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+How to use
 
-## Deploy on Vercel
+Open Home (/).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set the ARIA label, add/remove/reorder tabs, edit titles and content (up to 15 tabs).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In Export, choose All tabs or Tab N.
+
+Click Generate, then Copy or Download.
+
+Open the exported HTML directly in a browser.
+
+Arrow Left/Right switches tabs.
+
+Selected tab persists (cookie).
+
+Exported file uses only inline CSS/JS (no classes).
+
+About page (/about): shows your name, student number, and a how-to video.
+
+Theme: toggle Light/Dark in the header. Choice is saved in a cookie and applied server-side (no hydration issues).
+
+Project structure (key files)
+app/
+  layout.tsx         # sets <html data-theme> from cookie
+  page.tsx           # Tabs generator (export all or single tab)
+  about/page.tsx     # Minimal about page (name, student no., video)
+components/
+  Header.tsx         # nav + hamburger (CSS transform) + theme toggle
+  Breadcrumbs.tsx
+  Footer.tsx
+app/globals.css      # theme variables for light/dark
+
+Scripts
+{
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
+}
+
+Quick deploy (Azure VM, optional)
+
+sudo apt update -y
+sudo apt install -y ca-certificates curl git
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+sudo npm i -g pm2
+
+sudo mkdir -p /var/www && sudo chown "$USER":"$USER" /var/www
+cd /var/www
+git clone https://github.com/Thasi-03/my-assignment.git
+cd my-assignment
+npm ci || npm install
+npm run build
+pm2 start npm --name my-assignment -- start -- -H 0.0.0.0 -p 3000
+pm2 save
+
+
+(Optional Nginx reverse proxy to serve on port 80.)
+
+Troubleshooting
+
+Nothing at /: make sure you ran npm run dev (dev) or npm run build && npm run start (prod).
+
+Theme not changing: confirm globals.css defines colors for html[data-theme="light|dark"].
+
+Export looks wrong: click Generate before Copy/Download.
